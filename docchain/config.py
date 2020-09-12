@@ -1,4 +1,4 @@
-GOOGLE_CLIENT_ID = ''
-GOOGLE_SECRET = ''
+import configparser
 
-IMAGES_PATH = ''
+config = configparser.ConfigParser()
+config.read("./conf/docchain.conf")
