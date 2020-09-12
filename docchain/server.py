@@ -8,6 +8,11 @@ from flask import Flask, redirect, url_for, send_file, request
 from flask_dance.contrib.google import make_google_blueprint, google
 
 
+PASSPORTS_DIR = 'passports'
+SELFIES_DIR = 'selfies'
+DOCUMENTS_DIR = 'documents'
+
+
 app = Flask(__name__)
 app.secret_key = "supersekrit"
 blueprint = make_google_blueprint(
@@ -46,27 +51,42 @@ def profile():
     return "profile page"
 
 
+@app.route("/profile/save_images", methods=["POST"])
+def profile_save_images():
+    passport_image = request.files['passport']
+    selfie_image = request.files['selfie']
+
+    passport_uuid = uuid.uuid4()
+    selfie_uuid = uuid.uuid4()
+
+    file.save(os.path.join(config.IMAGES_PATH, PASSPORTS_DIR))
+    return "wait profile verification page"
+
+
 @app.route("/my_documents")
 def documents():
     return "my documents page"
 
 
-@app.route("/sign_requests")
+@app.route("/sign_documents")
 def sign_requests():
     return "sign requests page"
 
 
-@app.route("/sign?document_id=<document_id>")
+@app.route("/sign", methods=["POST"])
 def sign():
-    return '{"status": "OK"}'
+    document_id = request.args.get("document_id")
+    return f'{{status": "OK", "document_id": {document_id}}}'
 
 
-@app.route("/request_sign?document_id=<document_id>&user_mail=<user_mail>")
+@app.route("/request_sign", methods=["POST"])
 def request_sign():
-    return '{"status": "OK"}'
+    document_id = request.args.get("document_id")
+    user_mail = request.args.get("user_mail")
+    return f'{{"document_id": {document_id}, "user_mail": {user_mail}}}'
 
 
-@app.route("/doc", methods=['GET', 'POST', 'PUT'])
+@app.route("/doc")
 def load_image():
     _id = str(uuid.uuid4())
     file = request.files['pasport']
