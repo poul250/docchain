@@ -59,7 +59,7 @@ def profile_save_images():
     passport_uuid = uuid.uuid4()
     selfie_uuid = uuid.uuid4()
 
-    file.save(os.path.join(config.IMAGES_PATH, PASSPORTS_DIR))
+    file.save(os.path.join(config["DEFAULT"]["images_path"], PASSPORTS_DIR))
     return "wait profile verification page"
 
 
