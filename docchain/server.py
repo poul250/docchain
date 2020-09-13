@@ -6,7 +6,7 @@ import hashlib
 from docchain.config import config
 from docchain.database import sqlite_db, User, Document
 
-from flask import Flask, redirect, url_for, send_file, request, render_template
+from flask import Flask, redirect, url_for, send_file, request, render_template, send_from_directory
 from flask_dance.contrib.google import make_google_blueprint, google
 
 
@@ -99,7 +99,12 @@ def profile_save_images():
     if 'passport' in request.files:
         image = request.files['passport']
         new_id = str(uuid.uuid4())
-        image.save(os.path.join(images_path, PASSPORTS_DIR, new_id))
+        passports_path = os.path.join(images_path, PASSPORTS_DIR)
+
+        if not os.path.exists(passports_path):
+            os.mkdir(passports_path)
+
+        image.save(os.path.join(passports_path, new_id))
 
         user.passport_id = new_id
         user.save()
@@ -109,7 +114,12 @@ def profile_save_images():
     if 'selfy' in request.files:
         image = request.files['selfy']
         new_id = str(uuid.uuid4())
-        image.save(os.path.join(images_path, SELFIES_DIR, new_id))
+        selfies_path = os.path.join(images_path, SELFIES_DIR)
+
+        if not os.path.exists(selfies_path):
+            os.mkdir(selfies_path)
+
+        image.save(os.path.join(selfies_path, new_id))
 
         user.selfie_id = new_id
         user.save()
@@ -129,12 +139,14 @@ def documents():
     # TODO: get from database
     documents = [
         {
+            "id": "12345",
             "name": "Продажа квартиры",
             "user": {
                 "signed": False,
             }
         },
         {
+            "id": "123456",
             "name": "Продажа собаки",
             "user": {
                 "signed": False,
@@ -144,6 +156,7 @@ def documents():
             }
         },
         {
+            "id": "1234567",
             "name": "аренда вдски на месяц",
             "user": {
                 "signed": True,
@@ -153,6 +166,7 @@ def documents():
             }
         },
         {
+            "id": "12345678",
             "name": "Оплата пятерки по матану",
             "user": {
                 "signed": True,
@@ -177,20 +191,24 @@ def sign():
     return f'{{status": "OK", "document_id": {document_id}}}'
 
 
-@app.route("/request_sign", methods=["POST"])
+@app.route("/sign_req", methods=["POST"])
 def request_sign():
     document_id = request.args.get("document_id")
-    another_user_email = request.args.get("user_email")
-
+    another_user_email = request.args.get("email")
 
     return f'{{"document_id": {document_id}, "user_mail": {another_user_email}}}'
 
 
-@app.route("/create_doc")
-def load_image():
+@app.route("/document_save", methods=["POST"])
+def save_document():
     new_id = str(uuid.uuid4())
     document_img = request.files['document']
-    document_img.save(os.path.join(config["DEFAULT"]["images_path"], DOCUMENTS_DIR, new_id))
+    documents_path = os.path.join(config["DEFAULT"]["images_path"], DOCUMENTS_DIR)
+
+    if not os.path.exists(documents_path):
+        os.mkdir(documents_path)
+
+    document_img.save(os.path.join(documents_path, new_id))
 
     return json.dumps({"document_id": new_id})
 

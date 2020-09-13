@@ -45,11 +45,10 @@ $(document).ready(() => {
   // отправляем форму
   $("#sign_req").submit(function () {
     $.post(
-      "/sign_req", // адрес обработчика
-      $("#sign_req").serialize(), // отправляемые данные
+      "/request_sign", // адрес обработчика
+      $("#request_sign").serialize(), // отправляемые данные
 
       function (msg) {
-        alert(1);
         // закрываем окно
         $("#exampleModal").modal("hide");
         // обновляем статус
@@ -59,7 +58,6 @@ $(document).ready(() => {
 
     return false;
   });
-
   ///// загрузка и отправка документов ///////
   $("#addDocBtn").click(() => {
     // вызываем выбор файла

@@ -22,6 +22,9 @@
 
     <!-- my script -->
     <script src="js/my_documents.js"></script>
+    <script type=text/javascript src="{{
+        url_for('static', filename='my_documents.js') }}"></script>
+
 
     <title>Мои документы</title>
   </head>
@@ -73,7 +76,7 @@
         {% for document in documents %}
         <li
           class="list-group-item doc"
-          docId="12"
+          docId={{ document.id }}
           my_status="0"
           signer_status="0"
         >
@@ -103,9 +106,9 @@
                 </div>
               {% endif %}
             {% else %}
-            <div class="col-auto align-self-center sent_signer">
-              <button class="btn btn-primary">Отправить</button>
-            </div>
+              <div class="col-auto align-self-center sent_signer">
+                <button class="btn btn-primary">Отправить</button>
+              </div>
             {% endif %}
           </div>
         </li>
@@ -182,7 +185,7 @@
       class="d-none"
     >
       <label for="document">Выберите свое фото</label>
-      <input type="file" id="document" name="document" accept="pdf" required />
+      <input type="file" id="document" name="document" accept="application/pdf" required />
 
       <input type="submit" class="btn btn-primary" value="Загрузить" />
     </form>
