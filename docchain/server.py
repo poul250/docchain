@@ -4,7 +4,7 @@ import json
 import hashlib
 
 from docchain.config import config
-from docchain.database import sqlite_db, User, Document
+from docchain.database import sqlite_db, User, Document, DocumentSigns
 
 from flask import Flask, redirect, url_for, send_file, request, render_template, send_from_directory
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -136,46 +136,20 @@ def profile_save_images():
 def documents():
     user = get_user()
 
-    # TODO: get from database
-    documents = [
-        {
-            "id": "12345",
-            "name": "Продажа квартиры",
-            "user": {
-                "signed": False,
+    documents = []
+
+    for doc in Document.select().where(Document.user_id==user.id):
+        document = {"id": doc.id, "name": f"Документ №{doc.id}"}
+        signs = DocumentSigns.select().where(DocumentSigns.document_id==doc.id)
+
+        for sign in signs:
+            who = "user" if sign.signer_id == user.id else "other_user"
+
+            document[who] = {
+                "signed": sign.signed
             }
-        },
-        {
-            "id": "123456",
-            "name": "Продажа собаки",
-            "user": {
-                "signed": False,
-            },
-            "other_user": {
-                "signed": False
-            }
-        },
-        {
-            "id": "1234567",
-            "name": "аренда вдски на месяц",
-            "user": {
-                "signed": True,
-            },
-            "other_user": {
-                "signed": False
-            }
-        },
-        {
-            "id": "12345678",
-            "name": "Оплата пятерки по матану",
-            "user": {
-                "signed": True,
-            },
-            "other_user": {
-                "signed": True
-            }
-        }
-    ]
+
+        documents.append(document)
 
     return render_template('my_documents.html', documents=documents)
 
@@ -191,28 +165,47 @@ def sign():
     return f'{{status": "OK", "document_id": {document_id}}}'
 
 
-@app.route("/sign_req", methods=["POST"])
+@app.route("/request_sign", methods=["POST"])
 def request_sign():
     document_id = request.args.get("document_id")
-    another_user_email = request.args.get("email")
+    another_user_email = request.args.get("signer_mail")
+    raise Exception(request.args)
+    another_user = User.get_or_none(User.email == another_user_email)
 
-    return f'{{"document_id": {document_id}, "user_mail": {another_user_email}}}'
+    if another_user is None:
+        raise Exception()
+        return "Нет такого пользователя"
+    DocumentSigns.create(document_id=document_id, signer_id=another_user.id)
+    return "Отправлено"
+
+
+@app.route("/docs/<doc_id>")
+def get_doc(doc_id):
+    path = os.path.join(config['DEFAULT']['images_path'], DOCUMENTS_DIR, str(doc_id))
+
+    return send_file(path + '.pdf')
 
 
 @app.route("/document_save", methods=["POST"])
 def save_document():
-    new_id = str(uuid.uuid4())
-    document_img = request.files['document']
-    documents_path = os.path.join(config["DEFAULT"]["images_path"], DOCUMENTS_DIR)
+    user = get_user()
 
+    document_img = request.files['document']
+
+    document_hash = hashlib.md5(document_img.stream.read()).hexdigest()
+    document = Document.create(user=user, document_hash=document_hash)
+
+    DocumentSigns.create(document_id=document.id, signer_id=user.id)
+
+    documents_path = os.path.join(config["DEFAULT"]["images_path"], DOCUMENTS_DIR)
     if not os.path.exists(documents_path):
         os.mkdir(documents_path)
 
-    document_img.save(os.path.join(documents_path, new_id))
+    document_img.save(os.path.join(documents_path, f"{document.id}.pdf"))
 
-    return json.dumps({"document_id": new_id})
+    return redirect("/my_documents")
 
 
 if __name__ == "__main__":
-    sqlite_db.create_tables([User, Document], safe=True)
+    sqlite_db.create_tables([User, Document, DocumentSigns], safe=True)
     app.run(debug=config["DEFAULT"].getboolean("debug"))

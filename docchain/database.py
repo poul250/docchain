@@ -24,12 +24,11 @@ class User(_BaseModel):
 class Document(_BaseModel):
     id = PrimaryKeyField(null=False)
     user = ForeignKeyField(User)
-    other_user = ForeignKeyField(User)
     document_hash = TextField()
 
 
-class SignRequest(_BaseModel):
+class DocumentSigns(_BaseModel):
     id = PrimaryKeyField(null=False)
-    document = ForeignKeyField(Document)
-    user = ForeignKeyField(User)
-
+    document = ForeignKeyField(Document, null=False)
+    signer = ForeignKeyField(User, null=False)
+    signed = BooleanField(default=False)
