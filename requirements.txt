@@ -1,9 +1,10 @@
 authlib
+bigchaindb_driver
 flask
 flask-sso
 flask-dance
 passlib
-bigchaindb_driver
+peewee
 
 google-api-python-client
 google-auth

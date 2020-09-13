@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- my script -->
+    <script src="js/my_documents.js"></script>
+
+    <title>Мои документы</title>
+  </head>
+  <body>
+    <!----------------------  MENU ------------------------------>
+    <div
+      class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm"
+    >
+      <h5 class="my-0 mr-md-auto font-weight-normal">
+        <div class="d-none d-md-inline">Docchain</div>
+      </h5>
+      <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" class="btn disabled" href="my_documents"
+          ><b>Мои документы</b></a
+        >
+        <a class="p-2 text-dark" class="btn disabled" href="sign_documents"
+          >Подписание</a
+        >
+        <a class="p-2 text-dark" href="profile">Профиль</a>
+      </nav>
+    </div>
+
+    <!------------------------ Контент ------------------------>
+    <div class="container">
+      <br />
+      <h1 class="h1">
+        Мои документы
+        <svg
+          width="64px"
+          height="64px"
+          viewBox="0 0 16 16"
+          class="bi bi-plus-circle-fill text-primary btn"
+          id="addDocBtn"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"
+          />
+        </svg>
+      </h1>
+
+      <br />
+
+      <!------------- список документов ----------------->
+
+      <ul class="list-group">
+        {% for document in documents %}
+        <li
+          class="list-group-item doc"
+          docId="12"
+          my_status="0"
+          signer_status="0"
+        >
+          <div class="row">
+            <div
+              class="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9 align-self-center"
+            >
+              <a href="files/sihd1e7" target="_blanc">{{ document.name }}</a>
+            </div>
+            {% if document.user.signed %}
+              <div class="col-auto align-self-center sign text-success">
+                Вы подписали
+              </div>
+            {% else %}
+              <div class="col-auto align-self-center sign">
+                <button class="btn btn-outline-primary">Подписать</button>
+              </div>
+            {% endif %}
+            {% if document.other_user %}
+              {% if document.other_user.signed %}
+                <div class="col-auto align-self-center sent_signer text-success">
+                  Подписан
+                </div>
+              {% else %}
+                <div class="col-auto align-self-center sent_signer text-warning">
+                  Отправлен
+                </div>
+              {% endif %}
+            {% else %}
+            <div class="col-auto align-self-center sent_signer">
+              <button class="btn btn-primary">Отправить</button>
+            </div>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+        <!-- <li
+          class="list-group-item doc"
+          docId="13"
+          my_status="1"
+          signer_status="0"
+        >
+          <div class="row">
+            <div
+              class="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9 align-self-center"
+            >
+              <a href="files/sihd1e7" target="_blanc">Документ 2</a>
+            </div>
+            <div class="col-auto align-self-center sign text-success">
+              Вы подписали
+            </div>
+            <div class="col-auto align-self-center sent_signer">
+              <button class="btn btn-primary">Отправить</button>
+            </div>
+          </div>
+        </li>
+        <li
+          class="list-group-item doc"
+          docId="14"
+          my_status="1"
+          signer_status="2"
+        >
+          <div class="row">
+            <div
+              class="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9 align-self-center"
+            >
+              <a href="files/sihd1e7" target="_blanc">Документ 3</a>
+            </div>
+            <div class="col-auto align-self-center sign text-success">
+              Вы подписали
+            </div>
+            <div class="col-auto align-self-center sent_signer text-warning">
+              Отправлен
+            </div>
+          </div>
+        </li>
+        <li
+          class="list-group-item doc"
+          docId="15"
+          my_status="1"
+          signer_status="1"
+        >
+          <div class="row">
+            <div
+              class="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9 align-self-center"
+            >
+              <a href="files/sihd1e7" target="_blanc">Документ 3</a>
+            </div>
+            <div class="col-auto align-self-center sign text-success">
+              Вы подписали
+            </div>
+            <div class="col-auto align-self-center sent_signer text-success">
+              Подписан
+            </div>
+          </div>
+        </li> -->
+      </ul>
+    </div>
+
+    <!-- форма загрузки изображений-->
+    <form
+      enctype="multipart/form-data"
+      method="post"
+      id="formDoc"
+      action="document_save"
+      class="d-none"
+    >
+      <label for="document">Выберите свое фото</label>
+      <input type="file" id="document" name="document" accept="pdf" required />
+
+      <input type="submit" class="btn btn-primary" value="Загрузить" />
+    </form>
+    <br />
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <form class="modal-content" id="sign_req" onsubmit="return false">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Кто должен подписать документ?
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- доп данные -->
+            <input
+              type="text"
+              name="document_id"
+              value=""
+              required
+              class="d-none"
+            />
+            <div class="form-group container">
+              <label for="mail">Введите почту</label>
+              <input
+                type="email"
+                class="form-control"
+                id="mail"
+                aria-describedby="emailHelp"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Не отправлять
+            </button>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
