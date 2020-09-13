@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 
-import docchain.config as config
+from docchain.config import config
 
 from flask import Flask, redirect, url_for, send_file, request
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -16,8 +16,8 @@ DOCUMENTS_DIR = 'documents'
 app = Flask(__name__)
 app.secret_key = "supersekrit"
 blueprint = make_google_blueprint(
-    client_id=config.GOOGLE_CLIENT_ID,
-    client_secret=config.GOOGLE_SECRET,
+    client_id=config["GOOGLE"]["client_id"],
+    client_secret=config["GOOGLE"]["secret"],
     scope=["profile", "email"]
 )
 app.register_blueprint(blueprint, url_prefix="/login")
@@ -59,7 +59,7 @@ def profile_save_images():
     passport_uuid = uuid.uuid4()
     selfie_uuid = uuid.uuid4()
 
-    file.save(os.path.join(config.IMAGES_PATH, PASSPORTS_DIR))
+    file.save(os.path.join(config["DEFAULT"]["images_path"], PASSPORTS_DIR))
     return "wait profile verification page"
 
 
@@ -90,7 +90,7 @@ def request_sign():
 def load_image():
     _id = str(uuid.uuid4())
     file = request.files['pasport']
-    file.save(os.path.join(config.IMAGES_PATH, _id))
+    file.save(os.path.join(config["DEFAULT"]["images_path"], _id))
     return json.dumps({"doc_id": _id})
 
 
@@ -100,4 +100,4 @@ def get_image(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=config["DEFAULT"].getboolean("debug"))

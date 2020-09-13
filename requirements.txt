@@ -3,6 +3,7 @@ flask
 flask-sso
 flask-dance
 passlib
+bigchaindb_driver
 
 google-api-python-client
 google-auth
