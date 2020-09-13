@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import hashlib
 
 from docchain.config import config
 from docchain.database import sqlite_db, User, Document
@@ -16,10 +17,8 @@ DOCUMENTS_DIR = 'documents'
 app = Flask(__name__)
 app.secret_key = "supersekrit"
 blueprint = make_google_blueprint(
-    # client_id=config["GOOGLE"]["client_id"],
-    client_id='904301263978-a173aeq164ep1kdt620ghtmjt1mm19rn.apps.googleusercontent.com',
-    # client_secret=config["GOOGLE"]["secret"],
-    client_secret='oROOtZ0wZZbbGpHkyxLeg04S',
+    client_id=config["GOOGLE"]["client_id"],
+    client_secret=config["GOOGLE"]["secret"],
     scope=["profile", "email"]
 )
 app.register_blueprint(blueprint, url_prefix="/login")
@@ -30,7 +29,7 @@ def get_user():
     user, created = User.get_or_create(email=google_data['email'])
     if created:
         user.name = google_data['name']
-        user.save
+        user.save()
     
     return user
 
@@ -181,21 +180,19 @@ def sign():
 @app.route("/request_sign", methods=["POST"])
 def request_sign():
     document_id = request.args.get("document_id")
-    user_mail = request.args.get("user_mail")
-    return f'{{"document_id": {document_id}, "user_mail": {user_mail}}}'
+    another_user_email = request.args.get("user_email")
 
 
-@app.route("/doc")
+    return f'{{"document_id": {document_id}, "user_mail": {another_user_email}}}'
+
+
+@app.route("/create_doc")
 def load_image():
-    _id = str(uuid.uuid4())
-    file = request.files['pasport']
-    file.save(os.path.join(config["DEFAULT"]["images_path"], _id))
-    return json.dumps({"doc_id": _id})
+    new_id = str(uuid.uuid4())
+    document_img = request.files['document']
+    document_img.save(os.path.join(config["DEFAULT"]["images_path"], DOCUMENTS_DIR, new_id))
 
-
-@app.route("/get_pasport/<id>", methods=['GET', 'POST', 'PUT'])
-def get_image(id):
-    return send_file(id)
+    return json.dumps({"document_id": new_id})
 
 
 if __name__ == "__main__":

@@ -25,3 +25,11 @@ class Document(_BaseModel):
     id = PrimaryKeyField(null=False)
     user = ForeignKeyField(User)
     other_user = ForeignKeyField(User)
+    document_hash = TextField()
+
+
+class SignRequest(_BaseModel):
+    id = PrimaryKeyField(null=False)
+    document = ForeignKeyField(Document)
+    user = ForeignKeyField(User)
+

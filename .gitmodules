@@ -1,0 +1,3 @@
+[submodule "submodules/bigchaindb"]
+	path = submodules/bigchaindb
+	url = git@github.com:bigchaindb/bigchaindb.git
